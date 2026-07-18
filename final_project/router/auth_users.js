@@ -75,12 +75,11 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
 
   const username = req.session.authorization.username;
   const isbn = parseInt(req.params.isbn);
-  const review = req.body.review;
 
   const totalBook = Object.values(books).length;
   if (isbn > 0 && isbn <= totalBook) {
-    books[isbn].reviews[username] = review;
-    return res.status(200).json({ message: `Review added by ${username}` });
+    delete books[isbn].reviews[username];
+    return res.status(200).json({ message: `Review deleted by ${username}` });
   }
   return res.status(400).json({ message: "Invalid ISBN" });
 });
