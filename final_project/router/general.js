@@ -5,9 +5,38 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 
+const doesExist = (username) => {
+    // Filter the users array for any user with the same username
+    let userswithsamename = users.filter((user) => {
+        return user.username == username;
+    })
+
+    // Return true if any user with the same username is found
+    if (userswithsamename.length > 0) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const username = req.body.username;
+  const password = req.body.password;
+
+  // check if both username and password are provided
+  if (username && password) {
+    if (!doesExist(username)) {
+        users.push({'username': username, 'password': password});
+        return res.send('User successfully registered. Now you can login');
+    }
+    else {
+        return res.send('Unable to register user: Username already exists');
+    }
+  }
+  else {
+    return res.send('Unable to register user: You must provide both username and password');
+  }
 });
 
 // Get the book list available in the shop
