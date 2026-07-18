@@ -67,8 +67,14 @@ public_users.get('/title/:title',function (req, res) {
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = parseInt(req.params.isbn);
+    const totalBook = Object.values(books).length;
+    if (isbn > 0 && isbn <= totalBook) {
+      res.send(books[isbn].reviews);
+    }
+    else {
+      res.send('invalid isbn');
+    }
 });
 
 module.exports.general = public_users;
