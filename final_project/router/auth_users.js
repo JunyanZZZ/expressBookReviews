@@ -35,7 +35,7 @@ regd_users.post("/login", (req,res) => {
   if (authenticatedUser(username, password)) {
     // generate JWT access token
     let accessToken = jwt.sign(
-        {data: password}, 'access', {expiresIn: 60 * 60}
+        {username}, 'access', {expiresIn: 60 * 60}
     );
 
     // store access token in session
@@ -51,9 +51,40 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  if (!req.session.authorization) {
+    return res.status(401).send('Please login first!');
+  }
+
+  const username = req.session.authorization.username;
+  const isbn = parseInt(req.params.isbn);
+  const review = req.body.review;
+
+  const totalBook = Object.values(books).length;
+  if (isbn > 0 && isbn <= totalBook) {
+    books[isbn].reviews[username] = review;
+    return res.status(200).json({ message: `Review added by ${username}` });
+  }
+  return res.status(400).json({ message: "Invalid ISBN" });
 });
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  if (!req.session.authorization) {
+    return res.status(401).send('Please login first!');
+  }
+
+  const username = req.session.authorization.username;
+  const isbn = parseInt(req.params.isbn);
+  const review = req.body.review;
+
+  const totalBook = Object.values(books).length;
+  if (isbn > 0 && isbn <= totalBook) {
+    books[isbn].reviews[username] = review;
+    return res.status(200).json({ message: `Review added by ${username}` });
+  }
+  return res.status(400).json({ message: "Invalid ISBN" });
+});
+
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;

@@ -12,14 +12,14 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 
 app.use("/customer/auth/*", function auth(req,res,next){
 //Write the authenication mechanism here
-    if (req.session.authorization) {
-        let token = req.session.authorization['accessToken'];
+    if (req.session.authorization && req.session.authorization.accessToken) {
+        const token = req.session.authorization.accessToken;
 
         // verify JWT token
         jwt.verify(token, "access", (err, user) => {
             if (!err) {
-                req.user = user;
-                next();
+                req.user = req.session.authorization.username;
+                return next();
             }
             else {
                 return res.status(403).json({message: "User not authenticated"});
