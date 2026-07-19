@@ -53,16 +53,20 @@ public_users.get('/', async (req, res) => {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  const isbn = parseInt(req.params.isbn);
-  const totalBook = Object.values(books).length;
-  if (isbn > 0 && isbn <= totalBook) {
-    res.send(books[isbn]);
+public_users.get('/isbn/:isbn',async (req, res) => {
+  try {
+    const isbn = parseInt(req.params.isbn);
+    const totalBook = Object.values(books).length;
+    if (isbn > 0 && isbn <= totalBook) {
+      const book = await Promise.resolve(books[isbn]);
+      return res.status(200).json(book);
+    }
+    return res.status(400).json({message: 'invalid isbn'});
   }
-  else {
-    res.send('invalid isbn');
+  catch (err) {
+    return res.status(500).json({message: err.message});
   }
- });
+});
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
