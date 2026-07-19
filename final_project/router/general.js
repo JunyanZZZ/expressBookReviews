@@ -53,7 +53,7 @@ public_users.get('/', async (req, res) => {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',async (req, res) => {
+public_users.get('/isbn/:isbn', async (req, res) => {
   try {
     const isbn = parseInt(req.params.isbn);
     const totalBook = Object.values(books).length;
@@ -69,7 +69,7 @@ public_users.get('/isbn/:isbn',async (req, res) => {
 });
   
 // Get book details based on author
-public_users.get('/author/:author',async (req, res) => {
+public_users.get('/author/:author', async (req, res) => {
   try {
     const author = req.params.author;
     const filtered_books = {};
@@ -90,21 +90,23 @@ public_users.get('/author/:author',async (req, res) => {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  const title = req.params.title;
-  const filtered_books = {};
-
-  for (let isbn in books) {
-    if (books[isbn].title === title) {
-        filtered_books[isbn] = books[isbn];
+public_users.get('/title/:title', async (req, res) => {
+  try {
+    const title = req.params.title;
+    const filtered_books = {};
+    const bookList = await Promise.resolve(books);
+    for (let isbn in books) {
+      if (bookList[isbn].title === title) {
+          filtered_books[isbn] = books[isbn];
+      }
     }
+    if (Object.values(filtered_books).length > 0) {
+      return res.status(200).json(filtered_books);
+    }
+    return res.status(400).json({message: 'No matching title!'});
   }
-
-  if (Object.values(filtered_books).length > 0) {
-    res.send(filtered_books);
-  }
-  else {
-    res.send('No matching title!');
+  catch (err) {
+    return res.status(500).json({message: err.message})
   }
 });
 
