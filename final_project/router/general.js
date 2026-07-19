@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios').default;
 
 
 const doesExist = (username) => {
@@ -40,8 +41,15 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  res.send(JSON.stringify(books));
+
+public_users.get('/', async (req, res) => {
+  try {
+    const bookList = await Promise.resolve(books);
+    res.status(200).json(bookList);
+  }
+  catch (err) {
+    res.status(500).json({message: err.message});
+  }
 });
 
 // Get book details based on ISBN
